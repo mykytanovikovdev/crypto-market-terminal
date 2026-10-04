@@ -1,12 +1,16 @@
 import { mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import MarketTable from '@/features/market-table/MarketTable.vue';
+import type { SortState } from '@/types/market';
 import { coinListings } from '../../../fixtures/coingecko';
 import { createTestPlugins } from '../../../helpers/plugins';
 
-function mountMarketTable(watchlist: string[] = []) {
+function mountMarketTable(
+    watchlist: string[] = [],
+    sort: SortState = { key: 'rank', direction: 'asc' },
+) {
     return mount(MarketTable, {
-        props: { coins: coinListings, watchlist },
+        props: { coins: coinListings, watchlist, sort },
         global: { plugins: createTestPlugins() },
     });
 }
@@ -18,7 +22,6 @@ describe('MarketTable', () => {
         const bitcoinRow = rows[0]?.text() ?? '';
 
         expect(rows).toHaveLength(coinListings.length);
-        expect(bitcoinRow).toContain('1');
         expect(bitcoinRow).toContain('Bitcoin');
         expect(bitcoinRow).toContain('$64,250.12');
         expect(bitcoinRow).toContain('$1.27T');
@@ -35,26 +38,41 @@ describe('MarketTable', () => {
     });
 
     it('draws a labelled sparkline only when price history exists', () => {
-        const wrapper = mountMarketTable();
-        const sparklines = wrapper.findAll('.coin-sparkline');
+        const sparklines = mountMarketTable().findAll('.coin-sparkline');
 
         expect(sparklines).toHaveLength(2);
         expect(sparklines[0]?.attributes('aria-label')).toBe('Bitcoin price over the last 7 days');
     });
 
-    it('reflects watchlist state on the watch button', () => {
+    it('marks only the sorted column with aria-sort', () => {
+        const wrapper = mountMarketTable([], { key: 'price', direction: 'desc' });
+        const sortedHeadings = wrapper.findAll('th[aria-sort]');
+
+        expect(sortedHeadings).toHaveLength(1);
+        expect(sortedHeadings[0]?.text()).toContain('Price');
+        expect(sortedHeadings[0]?.attributes('aria-sort')).toBe('descending');
+    });
+
+    it('emits the sort key when a column heading is clicked', async () => {
+        const wrapper = mountMarketTable();
+        const priceButton = wrapper
+            .findAll('.market-table__sort-button')
+            .find((button) => button.text().includes('Price'));
+
+        await priceButton?.trigger('click');
+
+        expect(wrapper.emitted('sort')).toEqual([['price']]);
+    });
+
+    it('reflects watchlist state on the watch button and emits toggleWatch', async () => {
         const wrapper = mountMarketTable(['litecoin']);
         const buttons = wrapper.findAll('.market-table__watch-button');
 
         expect(buttons[0]?.attributes('aria-pressed')).toBe('false');
         expect(buttons[1]?.attributes('aria-pressed')).toBe('true');
         expect(buttons[1]?.attributes('aria-label')).toBe('Remove Litecoin from watchlist');
-    });
 
-    it('emits toggleWatch with the coin id', async () => {
-        const wrapper = mountMarketTable();
-
-        await wrapper.findAll('.market-table__watch-button')[0]?.trigger('click');
+        await buttons[0]?.trigger('click');
 
         expect(wrapper.emitted('toggleWatch')).toEqual([['bitcoin']]);
     });

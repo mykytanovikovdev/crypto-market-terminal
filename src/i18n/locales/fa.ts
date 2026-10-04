@@ -27,6 +27,17 @@ const fa: typeof en = {
         title: 'قیمت امروز ارزهای دیجیتال',
         description: '{count} ارز برتر بر اساس ارزش بازار، با قیمت دلار آمریکا.',
         updatedAt: 'به‌روزرسانی: {time}',
+        noResults: 'هیچ ارزی با جستجو یا فیلترهای شما مطابقت ندارد.',
+        resetFilters: 'پاک کردن جستجو و فیلترها',
+    },
+    marketToolbar: {
+        movementLabel: 'فیلتر بر اساس تغییر 24 ساعته',
+        all: 'همه',
+        gainers: 'صعودی',
+        losers: 'نزولی',
+        searchLabel: 'جستجوی ارز',
+        searchPlaceholder: 'جستجو با نام یا نماد',
+        rowsLabel: 'تعداد ردیف',
     },
     watchlist: {
         title: 'واچ‌لیست',
@@ -51,6 +62,7 @@ const fa: typeof en = {
         columns: {
             watch: 'واچ‌لیست',
             rank: 'رتبه',
+            rankShort: '#',
             name: 'نام',
             price: 'قیمت',
             change1h: '1 ساعت %',

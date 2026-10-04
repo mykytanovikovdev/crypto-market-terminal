@@ -19,9 +19,14 @@ function handleRetryClick(): void {
 </script>
 
 <template>
-    <div v-if="isLoading" class="request-state" role="status">
-        <span class="request-state__spinner" aria-hidden="true" />
-        {{ t('requestState.loading') }}
+    <div v-if="isLoading" role="status">
+        <slot name="loading">
+            <div class="request-state">
+                <span class="request-state__spinner" aria-hidden="true" />
+                {{ t('requestState.loading') }}
+            </div>
+        </slot>
+        <span v-if="$slots.loading" class="visually-hidden">{{ t('requestState.loading') }}</span>
     </div>
 
     <div v-else-if="errorMessage" class="request-state request-state--error" role="alert">

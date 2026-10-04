@@ -1,19 +1,25 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
-import { onMounted } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PageHeader from '@/components/PageHeader.vue';
 import RequestState from '@/components/RequestState.vue';
 import { useApiErrorMessage } from '@/composables/useApiErrorMessage';
 import MarketTable from '@/features/market-table/MarketTable.vue';
+import MarketTableSkeleton from '@/features/market-table/MarketTableSkeleton.vue';
+import { useSortQuery } from '@/features/market-table/useSortQuery';
 import { useMarketStore } from '@/stores/market';
+import { sortCoins } from '@/utils/sortCoins';
 
 const { t } = useI18n();
 const marketStore = useMarketStore();
-const { watchedCoins, watchlist, isLoading, loadError } = storeToRefs(marketStore);
-const errorMessage = useApiErrorMessage(loadError);
+const { watchedCoins, watchlist, isWatchlistLoading, watchlistError } = storeToRefs(marketStore);
+const errorMessage = useApiErrorMessage(watchlistError);
+const { sort, toggleSort } = useSortQuery();
 
-onMounted(marketStore.ensureCoinsLoaded);
+const sortedCoins = computed(() => sortCoins(watchedCoins.value, sort.value));
+
+onMounted(marketStore.refreshWatchedCoins);
 </script>
 
 <template>
@@ -21,11 +27,15 @@ onMounted(marketStore.ensureCoinsLoaded);
         <PageHeader :title="t('watchlist.title')" :description="t('watchlist.description')" />
 
         <RequestState
-            :is-loading="isLoading"
+            :is-loading="isWatchlistLoading"
             :error-message="errorMessage"
-            :is-empty="watchedCoins.length === 0"
-            @retry="marketStore.loadTopCoins"
+            :is-empty="sortedCoins.length === 0"
+            @retry="marketStore.loadWatchedCoins"
         >
+            <template #loading>
+                <MarketTableSkeleton />
+            </template>
+
             <template #empty>
                 <h2 class="watchlist-page__empty-title">{{ t('watchlist.emptyTitle') }}</h2>
                 <p>{{ t('watchlist.emptyText') }}</p>
@@ -35,9 +45,11 @@ onMounted(marketStore.ensureCoinsLoaded);
             </template>
 
             <MarketTable
-                :coins="watchedCoins"
+                :coins="sortedCoins"
                 :watchlist="watchlist"
+                :sort="sort"
                 @toggle-watch="marketStore.toggleWatch"
+                @sort="toggleSort"
             />
         </RequestState>
     </section>

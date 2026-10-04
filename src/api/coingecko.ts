@@ -6,6 +6,14 @@ const COINGECKO_BASE_URL = 'https://api.coingecko.com/api/v3';
 const QUOTE_CURRENCY = 'usd';
 
 export const TOP_COINS_LIMIT = 50;
+export const TOP_COINS_LIMIT_OPTIONS = [50, 100] as const;
+
+const MARKET_DATA_PARAMS = {
+    vs_currency: QUOTE_CURRENCY,
+    order: 'market_cap_desc',
+    sparkline: true,
+    price_change_percentage: '1h,24h,7d',
+} as const;
 
 export const coinGeckoClient = createHttpClient(COINGECKO_BASE_URL);
 
@@ -45,14 +53,19 @@ export function mapOhlcRowToCandle([
 
 export async function fetchTopCoins(limit = TOP_COINS_LIMIT): Promise<CoinListing[]> {
     const { data } = await coinGeckoClient.get<CoinGeckoMarketDto[]>('/coins/markets', {
-        params: {
-            vs_currency: QUOTE_CURRENCY,
-            order: 'market_cap_desc',
-            per_page: limit,
-            page: 1,
-            sparkline: true,
-            price_change_percentage: '1h,24h,7d',
-        },
+        params: { ...MARKET_DATA_PARAMS, per_page: limit, page: 1 },
+    });
+
+    return data.map(mapMarketDtoToCoinListing);
+}
+
+export async function fetchCoinsByIds(ids: string[]): Promise<CoinListing[]> {
+    if (ids.length === 0) {
+        return [];
+    }
+
+    const { data } = await coinGeckoClient.get<CoinGeckoMarketDto[]>('/coins/markets', {
+        params: { ...MARKET_DATA_PARAMS, ids: ids.join(','), per_page: ids.length, page: 1 },
     });
 
     return data.map(mapMarketDtoToCoinListing);

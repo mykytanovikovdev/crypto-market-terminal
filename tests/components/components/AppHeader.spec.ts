@@ -25,13 +25,17 @@ describe('AppHeader', () => {
     it('switches the interface to Persian', async () => {
         const wrapper = mountAppHeader();
 
-        await wrapper.find('.language-switch__option[lang="fa"]').trigger('click');
+        await wrapper
+            .find('.language-switch .segmented-control__option[lang="fa"]')
+            .trigger('click');
 
         expect(document.documentElement.dir).toBe('rtl');
         expect(wrapper.find('.app-header__nav-link').text()).toBe('بازارها');
-        expect(wrapper.find('.language-switch__option[lang="fa"]').attributes('aria-pressed')).toBe(
-            'true',
-        );
+        expect(
+            wrapper
+                .find('.language-switch .segmented-control__option[lang="fa"]')
+                .attributes('aria-pressed'),
+        ).toBe('true');
     });
 
     it('toggles the theme and updates the button label', async () => {

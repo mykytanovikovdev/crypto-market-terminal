@@ -1,6 +1,11 @@
 import type { AxiosResponse } from 'axios';
 import { describe, expect, it, vi } from 'vitest';
-import { coinGeckoClient, fetchTopCoins, mapOhlcRowToCandle } from '@/api/coingecko';
+import {
+    coinGeckoClient,
+    fetchCoinsByIds,
+    fetchTopCoins,
+    mapOhlcRowToCandle,
+} from '@/api/coingecko';
 import { coinGeckoMarketsResponse, coinListings } from '../../fixtures/coingecko';
 
 describe('fetchTopCoins', () => {
@@ -29,6 +34,31 @@ describe('fetchTopCoins', () => {
         } as AxiosResponse);
 
         expect(await fetchTopCoins(3)).toEqual(coinListings);
+    });
+});
+
+describe('fetchCoinsByIds', () => {
+    it('requests only the given coins', async () => {
+        const getSpy = vi
+            .spyOn(coinGeckoClient, 'get')
+            .mockResolvedValue({ data: coinGeckoMarketsResponse.slice(0, 2) } as AxiosResponse);
+
+        const listings = await fetchCoinsByIds(['bitcoin', 'litecoin']);
+
+        expect(getSpy).toHaveBeenCalledWith(
+            '/coins/markets',
+            expect.objectContaining({
+                params: expect.objectContaining({ ids: 'bitcoin,litecoin', per_page: 2 }),
+            }),
+        );
+        expect(listings.map((coin) => coin.id)).toEqual(['bitcoin', 'litecoin']);
+    });
+
+    it('skips the request for an empty list', async () => {
+        const getSpy = vi.spyOn(coinGeckoClient, 'get');
+
+        expect(await fetchCoinsByIds([])).toEqual([]);
+        expect(getSpy).not.toHaveBeenCalled();
     });
 });
 

@@ -3,17 +3,47 @@ import { useI18n } from 'vue-i18n';
 import PercentChange from '@/components/PercentChange.vue';
 import { useLocale } from '@/composables/useLocale';
 import CoinSparkline from '@/features/market-table/CoinSparkline.vue';
-import type { CoinListing } from '@/types/market';
+import type { CoinListing, SortKey, SortState } from '@/types/market';
 import { formatCompactCurrency, formatCompactNumber, formatPrice } from '@/utils/format';
 
 const props = defineProps<{
     coins: CoinListing[];
     watchlist: string[];
+    sort: SortState;
 }>();
 
 const emit = defineEmits<{
     toggleWatch: [coinId: string];
+    sort: [key: SortKey];
 }>();
+
+interface ColumnDefinition {
+    sortKey: SortKey;
+    labelKey: string;
+    titleKey?: string;
+    modifier: 'rank' | 'name' | 'numeric';
+}
+
+const COLUMNS: ColumnDefinition[] = [
+    {
+        sortKey: 'rank',
+        labelKey: 'marketTable.columns.rankShort',
+        titleKey: 'marketTable.columns.rank',
+        modifier: 'rank',
+    },
+    { sortKey: 'name', labelKey: 'marketTable.columns.name', modifier: 'name' },
+    { sortKey: 'price', labelKey: 'marketTable.columns.price', modifier: 'numeric' },
+    { sortKey: 'change1h', labelKey: 'marketTable.columns.change1h', modifier: 'numeric' },
+    { sortKey: 'change24h', labelKey: 'marketTable.columns.change24h', modifier: 'numeric' },
+    { sortKey: 'change7d', labelKey: 'marketTable.columns.change7d', modifier: 'numeric' },
+    { sortKey: 'marketCap', labelKey: 'marketTable.columns.marketCap', modifier: 'numeric' },
+    { sortKey: 'volume24h', labelKey: 'marketTable.columns.volume24h', modifier: 'numeric' },
+    {
+        sortKey: 'circulatingSupply',
+        labelKey: 'marketTable.columns.circulatingSupply',
+        modifier: 'numeric',
+    },
+];
 
 const { t } = useI18n();
 const { numberLocale } = useLocale();
@@ -33,6 +63,22 @@ function getWatchButtonLabel(coin: CoinListing): string {
 function handleWatchClick(coinId: string): void {
     emit('toggleWatch', coinId);
 }
+
+function handleSortClick(key: SortKey): void {
+    emit('sort', key);
+}
+
+function getAriaSort(key: SortKey): 'ascending' | 'descending' | undefined {
+    if (props.sort.key !== key) {
+        return undefined;
+    }
+
+    return props.sort.direction === 'asc' ? 'ascending' : 'descending';
+}
+
+function getSortIconState(key: SortKey): 'asc' | 'desc' | 'none' {
+    return props.sort.key === key ? props.sort.direction : 'none';
+}
 </script>
 
 <template>
@@ -48,32 +94,34 @@ function handleWatchClick(coinId: string): void {
                     <th class="market-table__heading market-table__heading--watch" scope="col">
                         <span class="visually-hidden">{{ t('marketTable.columns.watch') }}</span>
                     </th>
-                    <th class="market-table__heading market-table__heading--rank" scope="col">
-                        <abbr :title="t('marketTable.columns.rank')">#</abbr>
-                    </th>
-                    <th class="market-table__heading market-table__heading--name" scope="col">
-                        {{ t('marketTable.columns.name') }}
-                    </th>
-                    <th class="market-table__heading market-table__heading--numeric" scope="col">
-                        {{ t('marketTable.columns.price') }}
-                    </th>
-                    <th class="market-table__heading market-table__heading--numeric" scope="col">
-                        {{ t('marketTable.columns.change1h') }}
-                    </th>
-                    <th class="market-table__heading market-table__heading--numeric" scope="col">
-                        {{ t('marketTable.columns.change24h') }}
-                    </th>
-                    <th class="market-table__heading market-table__heading--numeric" scope="col">
-                        {{ t('marketTable.columns.change7d') }}
-                    </th>
-                    <th class="market-table__heading market-table__heading--numeric" scope="col">
-                        {{ t('marketTable.columns.marketCap') }}
-                    </th>
-                    <th class="market-table__heading market-table__heading--numeric" scope="col">
-                        {{ t('marketTable.columns.volume24h') }}
-                    </th>
-                    <th class="market-table__heading market-table__heading--numeric" scope="col">
-                        {{ t('marketTable.columns.circulatingSupply') }}
+                    <th
+                        v-for="column in COLUMNS"
+                        :key="column.sortKey"
+                        class="market-table__heading"
+                        :class="`market-table__heading--${column.modifier}`"
+                        scope="col"
+                        :aria-sort="getAriaSort(column.sortKey)"
+                    >
+                        <button
+                            type="button"
+                            class="market-table__sort-button"
+                            :class="{
+                                'market-table__sort-button--active': sort.key === column.sortKey,
+                            }"
+                            :title="column.titleKey ? t(column.titleKey) : undefined"
+                            @click="handleSortClick(column.sortKey)"
+                        >
+                            {{ t(column.labelKey) }}
+                            <svg
+                                class="market-table__sort-icon"
+                                :class="`market-table__sort-icon--${getSortIconState(column.sortKey)}`"
+                                viewBox="0 0 8 12"
+                                aria-hidden="true"
+                            >
+                                <path class="market-table__sort-arrow-up" d="M4 0 8 4.5H0Z" />
+                                <path class="market-table__sort-arrow-down" d="M4 12 0 7.5h8Z" />
+                            </svg>
+                        </button>
                     </th>
                     <th class="market-table__heading market-table__heading--numeric" scope="col">
                         {{ t('marketTable.columns.last7Days') }}
@@ -194,10 +242,6 @@ function handleWatchClick(coinId: string): void {
         text-align: start;
         white-space: nowrap;
 
-        abbr {
-            text-decoration: none;
-        }
-
         &--numeric {
             text-align: end;
         }
@@ -214,6 +258,39 @@ function handleWatchClick(coinId: string): void {
             @include from(md) {
                 display: table-cell;
             }
+        }
+    }
+
+    &__sort-button {
+        display: inline-flex;
+        gap: var(--space-1);
+        align-items: center;
+        padding: 0;
+        background: none;
+        border: 0;
+        color: inherit;
+        font: inherit;
+        white-space: nowrap;
+        cursor: pointer;
+
+        &:hover,
+        &--active {
+            color: var(--color-accent);
+        }
+    }
+
+    &__heading--numeric &__sort-button {
+        flex-direction: row-reverse;
+    }
+
+    &__sort-icon {
+        inline-size: 0.5rem;
+        block-size: 0.75rem;
+        fill: var(--color-icon-subtle);
+
+        &--asc .market-table__sort-arrow-up,
+        &--desc .market-table__sort-arrow-down {
+            fill: currentcolor;
         }
     }
 
