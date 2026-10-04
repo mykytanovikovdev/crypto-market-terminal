@@ -1,9 +1,11 @@
 import { defineStore } from 'pinia';
 import { computed, ref, watch } from 'vue';
-import { fetchTopCoins } from '@/api/coingecko';
-import { toApiError, type ApiError } from '@/api/http';
+import { fetchCoinsByIds, fetchTopCoins, TOP_COINS_LIMIT } from '@/api/coingecko';
+import { useAsyncResource } from '@/composables/useAsyncResource';
 import type { CoinListing } from '@/types/market';
 import { readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage';
+
+const CACHE_TTL_MS = 60_000;
 
 function readSavedWatchlist(): string[] {
     const savedWatchlist = readStorage(STORAGE_KEYS.watchlist);
@@ -22,33 +24,42 @@ function readSavedWatchlist(): string[] {
 }
 
 export const useMarketStore = defineStore('market', () => {
-    const coins = ref<CoinListing[]>([]);
+    const topCoins = useAsyncResource(fetchTopCoins, [] as CoinListing[]);
+    const loadedLimit = ref<number>(TOP_COINS_LIMIT);
+
     const watchlist = ref<string[]>(readSavedWatchlist());
-    const isLoading = ref<boolean>(false);
-    const loadError = ref<ApiError | null>(null);
-    const lastUpdatedAt = ref<Date | null>(null);
+    const watchlistCoins = useAsyncResource(fetchCoinsByIds, [] as CoinListing[]);
 
     const watchedCoins = computed(() =>
-        coins.value.filter((coin) => watchlist.value.includes(coin.id)),
+        watchlistCoins.data.value.filter((coin) => watchlist.value.includes(coin.id)),
     );
 
-    async function loadTopCoins(): Promise<void> {
-        isLoading.value = true;
-        loadError.value = null;
+    async function loadTopCoins(limit: number = loadedLimit.value): Promise<void> {
+        loadedLimit.value = limit;
+        await topCoins.load(limit);
+    }
 
-        try {
-            coins.value = await fetchTopCoins();
-            lastUpdatedAt.value = new Date();
-        } catch (error) {
-            loadError.value = toApiError(error);
-        } finally {
-            isLoading.value = false;
+    async function refreshTopCoins(limit: number = TOP_COINS_LIMIT): Promise<void> {
+        const hasFreshData =
+            limit === loadedLimit.value &&
+            topCoins.data.value.length > 0 &&
+            topCoins.isFresh(CACHE_TTL_MS);
+
+        if (!hasFreshData) {
+            await loadTopCoins(limit);
         }
     }
 
-    async function ensureCoinsLoaded(): Promise<void> {
-        if (coins.value.length === 0 && !isLoading.value) {
-            await loadTopCoins();
+    async function loadWatchedCoins(): Promise<void> {
+        await watchlistCoins.load([...watchlist.value]);
+    }
+
+    async function refreshWatchedCoins(): Promise<void> {
+        const loadedIds = new Set(watchlistCoins.data.value.map((coin) => coin.id));
+        const hasAllWatchedCoins = watchlist.value.every((coinId) => loadedIds.has(coinId));
+
+        if (!hasAllWatchedCoins || !watchlistCoins.isFresh(CACHE_TTL_MS)) {
+            await loadWatchedCoins();
         }
     }
 
@@ -69,14 +80,19 @@ export const useMarketStore = defineStore('market', () => {
     watch(watchlist, saveWatchlist);
 
     return {
-        coins,
+        coins: topCoins.data,
+        isLoading: topCoins.isLoading,
+        loadError: topCoins.error,
+        lastUpdatedAt: topCoins.updatedAt,
+        loadedLimit,
         watchlist,
-        isLoading,
-        loadError,
-        lastUpdatedAt,
         watchedCoins,
+        isWatchlistLoading: watchlistCoins.isLoading,
+        watchlistError: watchlistCoins.error,
         loadTopCoins,
-        ensureCoinsLoaded,
+        refreshTopCoins,
+        loadWatchedCoins,
+        refreshWatchedCoins,
         isWatched,
         toggleWatch,
     };

@@ -25,6 +25,17 @@ export default {
         title: "Today's cryptocurrency prices",
         description: 'The top {count} coins by market capitalization, priced in US dollars.',
         updatedAt: 'Updated at {time}',
+        noResults: 'No coins match your search or filters.',
+        resetFilters: 'Clear search and filters',
+    },
+    marketToolbar: {
+        movementLabel: 'Filter by 24h change',
+        all: 'All',
+        gainers: 'Gainers',
+        losers: 'Losers',
+        searchLabel: 'Search coins',
+        searchPlaceholder: 'Search by name or ticker',
+        rowsLabel: 'Rows',
     },
     watchlist: {
         title: 'Watchlist',
@@ -49,6 +60,7 @@ export default {
         columns: {
             watch: 'Watchlist',
             rank: 'Rank',
+            rankShort: '#',
             name: 'Name',
             price: 'Price',
             change1h: '1h %',

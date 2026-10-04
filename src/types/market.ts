@@ -28,3 +28,23 @@ export interface TickerUpdate {
 }
 
 export type PriceDirection = 'up' | 'down' | 'flat';
+
+export type SortKey =
+    | 'rank'
+    | 'name'
+    | 'price'
+    | 'change1h'
+    | 'change24h'
+    | 'change7d'
+    | 'marketCap'
+    | 'volume24h'
+    | 'circulatingSupply';
+
+export type SortDirection = 'asc' | 'desc';
+
+export interface SortState {
+    key: SortKey;
+    direction: SortDirection;
+}
+
+export type MovementFilter = 'all' | 'gainers' | 'losers';
