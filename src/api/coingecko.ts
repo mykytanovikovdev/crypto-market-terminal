@@ -1,35 +1,56 @@
-// Thin client for CoinGecko's free tier (no API key needed, ~30 req/min).
-// Docs: https://docs.coingecko.com/reference/introduction
-import type { CoinListing, Candle } from '../types/market';
+import { createHttpClient } from '@/api/http';
+import type { CoinGeckoMarketDto, CoinGeckoOhlcRow } from '@/types/coingecko';
+import type { Candle, CoinListing } from '@/types/market';
 
-const BASE = 'https://api.coingecko.com/api/v3';
+const COINGECKO_BASE_URL = 'https://api.coingecko.com/api/v3';
+const QUOTE_CURRENCY = 'usd';
+
+export const coinGeckoClient = createHttpClient(COINGECKO_BASE_URL);
+
+export function mapMarketDtoToCoinListing(dto: CoinGeckoMarketDto): CoinListing {
+    return {
+        id: dto.id,
+        symbol: dto.symbol,
+        name: dto.name,
+        price: dto.current_price,
+        change24h: dto.price_change_percentage_24h ?? 0,
+        marketCap: dto.market_cap,
+    };
+}
+
+export function mapOhlcRowToCandle([
+    timestampMs,
+    open,
+    high,
+    low,
+    close,
+]: CoinGeckoOhlcRow): Candle {
+    return {
+        time: Math.floor(timestampMs / 1000),
+        open,
+        high,
+        low,
+        close,
+    };
+}
 
 export async function fetchTopCoins(limit = 50): Promise<CoinListing[]> {
-  const url = `${BASE}/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${limit}&page=1`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`CoinGecko error ${res.status}`);
-  const data = await res.json();
-  return data.map((c: any): CoinListing => ({
-    id: c.id,
-    symbol: c.symbol,
-    name: c.name,
-    price: c.current_price,
-    change24h: c.price_change_percentage_24h ?? 0,
-    marketCap: c.market_cap,
-  }));
+    const { data } = await coinGeckoClient.get<CoinGeckoMarketDto[]>('/coins/markets', {
+        params: {
+            vs_currency: QUOTE_CURRENCY,
+            order: 'market_cap_desc',
+            per_page: limit,
+            page: 1,
+        },
+    });
+
+    return data.map(mapMarketDtoToCoinListing);
 }
 
 export async function fetchCandles(coinId: string, days = 1): Promise<Candle[]> {
-  // TODO: CoinGecko's OHLC endpoint — /coins/{id}/ohlc?vs_currency=usd&days={days}
-  const url = `${BASE}/coins/${coinId}/ohlc?vs_currency=usd&days=${days}`;
-  const res = await fetch(url);
-  if (!res.ok) throw new Error(`CoinGecko error ${res.status}`);
-  const data = await res.json();
-  return data.map((row: number[]): Candle => ({
-    time: Math.floor(row[0] / 1000),
-    open: row[1],
-    high: row[2],
-    low: row[3],
-    close: row[4],
-  }));
+    const { data } = await coinGeckoClient.get<CoinGeckoOhlcRow[]>(`/coins/${coinId}/ohlc`, {
+        params: { vs_currency: QUOTE_CURRENCY, days },
+    });
+
+    return data.map(mapOhlcRowToCandle);
 }

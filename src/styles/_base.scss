@@ -1,0 +1,49 @@
+body {
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-display);
+    -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+}
+
+a {
+    color: var(--color-amber);
+}
+
+::selection {
+    background: var(--color-amber-dim);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-amber);
+    outline-offset: 2px;
+}
+
+::-webkit-scrollbar {
+    inline-size: 0.5rem;
+    block-size: 0.5rem;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-line);
+    border-radius: var(--radius);
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+}

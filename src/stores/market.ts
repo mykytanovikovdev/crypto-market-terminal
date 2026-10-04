@@ -1,26 +1,37 @@
 import { defineStore } from 'pinia';
-import type { CoinListing } from '../types/market';
-import { fetchTopCoins } from '../api/coingecko';
+import { ref } from 'vue';
+import { fetchTopCoins } from '@/api/coingecko';
+import { toApiError, type ApiError } from '@/api/http';
+import type { CoinListing } from '@/types/market';
 
-export const useMarketStore = defineStore('market', {
-  state: () => ({
-    coins: [] as CoinListing[],
-    watchlist: [] as string[], // coin ids, persisted separately (localStorage) once built
-    loading: false,
-  }),
-  actions: {
-    async loadTopCoins() {
-      this.loading = true;
-      try {
-        this.coins = await fetchTopCoins();
-      } finally {
-        this.loading = false;
-      }
-    },
-    toggleWatch(id: string) {
-      const i = this.watchlist.indexOf(id);
-      if (i === -1) this.watchlist.push(id);
-      else this.watchlist.splice(i, 1);
-    },
-  },
+export const useMarketStore = defineStore('market', () => {
+    const coins = ref<CoinListing[]>([]);
+    const watchlist = ref<string[]>([]);
+    const isLoading = ref<boolean>(false);
+    const loadError = ref<ApiError | null>(null);
+
+    async function loadTopCoins(): Promise<void> {
+        isLoading.value = true;
+        loadError.value = null;
+
+        try {
+            coins.value = await fetchTopCoins();
+        } catch (error) {
+            loadError.value = toApiError(error);
+        } finally {
+            isLoading.value = false;
+        }
+    }
+
+    function isWatched(coinId: string): boolean {
+        return watchlist.value.includes(coinId);
+    }
+
+    function toggleWatch(coinId: string): void {
+        watchlist.value = isWatched(coinId)
+            ? watchlist.value.filter((watchedId) => watchedId !== coinId)
+            : [...watchlist.value, coinId];
+    }
+
+    return { coins, watchlist, isLoading, loadError, loadTopCoins, isWatched, toggleWatch };
 });

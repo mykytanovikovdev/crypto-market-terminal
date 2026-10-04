@@ -1,0 +1,30 @@
+:root {
+    --color-bg: #1a1614;
+    --color-bg-raised: #221d1a;
+    --color-line: #3a322c;
+    --color-text: #ece6dd;
+    --color-text-dim: #9c9188;
+    --color-amber: #f5a623;
+    --color-amber-dim: #7a5a1f;
+    --color-up: #4caf7d;
+    --color-down: #d16b6b;
+
+    --font-display: 'IBM Plex Sans', system-ui, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SFMono-Regular', menlo, monospace;
+
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.8125rem;
+    --font-size-md: 0.875rem;
+    --font-size-lg: 1.25rem;
+
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-16: 4rem;
+
+    --radius: 0.1875rem;
+    --layout-max-width: 60rem;
+}
