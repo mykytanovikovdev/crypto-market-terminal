@@ -1,0 +1,62 @@
+/* ---------------------------------------------------------------
+   Design tokens — "Phosphor Terminal"
+   A warm, dark, amber-on-charcoal terminal aesthetic, closer to an
+   old Bloomberg/CRT ticker than a generic neon-green fintech app.
+   Red/green are reserved ONLY for price direction — never used
+   decoratively — so they stay meaningful wherever they appear.
+   --------------------------------------------------------------- */
+:root {
+  --bg: #1a1614;          /* warm charcoal, not a flat near-black */
+  --bg-raised: #221d1a;   /* panels, rows on hover */
+  --line: #3a322c;        /* hairline dividers */
+  --text: #ece6dd;        /* warm off-white, not pure white */
+  --text-dim: #9c9188;    /* secondary/meta text */
+  --amber: #f5a623;       /* primary accent — brand, highlights, active state */
+  --amber-dim: #7a5a1f;   /* subdued amber for borders/backgrounds */
+  --up: #4caf7d;          /* price increase — functional only */
+  --down: #d16b6b;        /* price decrease — functional only */
+
+  --font-display: 'IBM Plex Sans', system-ui, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', Menlo, monospace;
+
+  --radius: 3px;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-display);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3 {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.mono {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.up { color: var(--up); }
+.down { color: var(--down); }
+
+a { color: var(--amber); }
+
+::selection {
+  background: var(--amber-dim);
+}
+
+/* thin, deliberate scrollbars — a terminal shouldn't look like a browser default */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: var(--radius); }
+::-webkit-scrollbar-track { background: transparent; }
