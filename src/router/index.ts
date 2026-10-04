@@ -5,12 +5,25 @@ export const router = createRouter({
     routes: [
         {
             path: '/',
-            name: 'market',
-            component: () => import('@/features/market-table/MarketOverview.vue'),
+            name: 'markets',
+            component: () => import('@/features/markets/MarketsPage.vue'),
+            meta: { titleKey: 'nav.markets' },
+        },
+        {
+            path: '/watchlist',
+            name: 'watchlist',
+            component: () => import('@/features/watchlist/WatchlistPage.vue'),
+            meta: { titleKey: 'nav.watchlist' },
+        },
+        {
+            path: '/about',
+            name: 'about',
+            component: () => import('@/features/about/AboutPage.vue'),
+            meta: { titleKey: 'nav.about' },
         },
         {
             path: '/:pathMatch(.*)*',
-            redirect: { name: 'market' },
+            redirect: { name: 'markets' },
         },
     ],
 });

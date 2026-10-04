@@ -5,20 +5,29 @@
 }
 
 html,
-body,
-#app {
-    block-size: 100%;
+body {
     margin: 0;
 }
 
 h1,
 h2,
 h3,
-p {
+p,
+ul {
     margin: 0;
+}
+
+ul {
+    padding: 0;
+    list-style: none;
 }
 
 button {
     font: inherit;
     color: inherit;
+}
+
+img,
+svg {
+    display: block;
 }

@@ -4,17 +4,31 @@ import { coinGeckoClient, fetchTopCoins, mapOhlcRowToCandle } from '@/api/coinge
 import { coinGeckoMarketsResponse, coinListings } from '../../fixtures/coingecko';
 
 describe('fetchTopCoins', () => {
-    it('requests coins ordered by market cap and maps them to listings', async () => {
+    it('requests market data with sparklines and multi-period changes', async () => {
         const getSpy = vi
             .spyOn(coinGeckoClient, 'get')
             .mockResolvedValue({ data: coinGeckoMarketsResponse } as AxiosResponse);
 
-        const listings = await fetchTopCoins(3);
+        await fetchTopCoins(3);
 
         expect(getSpy).toHaveBeenCalledWith('/coins/markets', {
-            params: { vs_currency: 'usd', order: 'market_cap_desc', per_page: 3, page: 1 },
+            params: {
+                vs_currency: 'usd',
+                order: 'market_cap_desc',
+                per_page: 3,
+                page: 1,
+                sparkline: true,
+                price_change_percentage: '1h,24h,7d',
+            },
         });
-        expect(listings).toEqual(coinListings);
+    });
+
+    it('maps DTOs to listings and fills missing values with null or empty data', async () => {
+        vi.spyOn(coinGeckoClient, 'get').mockResolvedValue({
+            data: coinGeckoMarketsResponse,
+        } as AxiosResponse);
+
+        expect(await fetchTopCoins(3)).toEqual(coinListings);
     });
 });
 

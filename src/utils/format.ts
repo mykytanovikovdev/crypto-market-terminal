@@ -1,36 +1,49 @@
 const QUOTE_CURRENCY = 'USD';
-const WHOLE_DOLLAR_THRESHOLD = 1000;
 const SUB_DOLLAR_SIGNIFICANT_DIGITS = 4;
 
-export function formatPrice(value: number, locale: string): string {
-    const options: Intl.NumberFormatOptions = { style: 'currency', currency: QUOTE_CURRENCY };
-
-    if (value >= WHOLE_DOLLAR_THRESHOLD) {
-        options.maximumFractionDigits = 0;
-    } else if (value < 1) {
-        options.maximumSignificantDigits = SUB_DOLLAR_SIGNIFICANT_DIGITS;
-    } else {
-        options.minimumFractionDigits = 2;
-        options.maximumFractionDigits = 2;
-    }
-
-    return new Intl.NumberFormat(locale, options).format(value);
+function roundsToAtLeastOneDollar(value: number): boolean {
+    return Number(value.toPrecision(SUB_DOLLAR_SIGNIFICANT_DIGITS)) >= 1;
 }
 
-export function formatPercentChange(percent: number, locale: string): string {
+export function formatPrice(value: number, locale: string): string {
+    const options: Intl.NumberFormatOptions = roundsToAtLeastOneDollar(value)
+        ? { minimumFractionDigits: 2, maximumFractionDigits: 2 }
+        : {
+              minimumSignificantDigits: SUB_DOLLAR_SIGNIFICANT_DIGITS,
+              maximumSignificantDigits: SUB_DOLLAR_SIGNIFICANT_DIGITS,
+          };
+
+    return new Intl.NumberFormat(locale, {
+        style: 'currency',
+        currency: QUOTE_CURRENCY,
+        ...options,
+    }).format(value);
+}
+
+export function formatPercent(percent: number, locale: string): string {
     return new Intl.NumberFormat(locale, {
         style: 'percent',
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-        signDisplay: 'exceptZero',
-    }).format(percent / 100);
+    }).format(Math.abs(percent) / 100);
 }
 
-export function formatMarketCap(value: number, locale: string): string {
+export function formatCompactCurrency(value: number, locale: string): string {
     return new Intl.NumberFormat(locale, {
         style: 'currency',
         currency: QUOTE_CURRENCY,
         notation: 'compact',
-        maximumFractionDigits: 1,
+        maximumFractionDigits: 2,
     }).format(value);
+}
+
+export function formatCompactNumber(value: number, locale: string): string {
+    return new Intl.NumberFormat(locale, {
+        notation: 'compact',
+        maximumFractionDigits: 2,
+    }).format(value);
+}
+
+export function formatTime(date: Date, locale: string): string {
+    return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(date);
 }

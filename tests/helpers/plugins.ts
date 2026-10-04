@@ -1,10 +1,22 @@
-import { createI18n } from 'vue-i18n';
-import en from '@/i18n/locales/en';
+import { createPinia } from 'pinia';
+import { createMemoryHistory, createRouter } from 'vue-router';
+import { i18n } from '@/i18n';
 
-export function createTestI18n() {
-    return createI18n({
-        legacy: false,
-        locale: 'en',
-        messages: { en },
+const stubPage = { template: '<div />' };
+
+export function createTestRouter() {
+    return createRouter({
+        history: createMemoryHistory(),
+        routes: [
+            { path: '/', name: 'markets', component: stubPage },
+            { path: '/watchlist', name: 'watchlist', component: stubPage },
+            { path: '/about', name: 'about', component: stubPage },
+        ],
     });
+}
+
+export function createTestPlugins() {
+    i18n.global.locale.value = 'en';
+
+    return [i18n, createPinia(), createTestRouter()];
 }

@@ -14,13 +14,17 @@ Avoid asserting on layout or exact markup that may change with styling.
 
 ## Setup
 
-Components that use translations need the i18n plugin:
+Components rely on i18n, Pinia and the router. `createTestPlugins()` provides all three
+(English locale, a fresh Pinia, an in-memory router with the app's route names):
 
 ```ts
-import { createTestI18n } from '../../../helpers/plugins';
+import { createTestPlugins } from '../../../helpers/plugins';
 
-mount(MyComponent, { global: { plugins: [createTestI18n()] } });
+mount(MyComponent, { global: { plugins: createTestPlugins() } });
 ```
+
+Tests that switch language or theme reset them in `afterEach`, because both live on
+`<html>` and are shared across tests in the file.
 
 Run only this group:
 
