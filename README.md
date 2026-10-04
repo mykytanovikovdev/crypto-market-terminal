@@ -3,6 +3,15 @@
 A live crypto market dashboard built with Vue 3 + TypeScript: REST API
 integration, real-time data over WebSocket, and a deliberately non-generic UI.
 
+## Features
+
+- Top 50 coins by market cap: price, 1h / 24h / 7d change, market cap, 24h volume,
+  circulating supply and a 7-day sparkline
+- Watchlist saved in the browser
+- English and Persian (right-to-left) interface
+- Light and dark themes that follow the system setting by default
+- Responsive layout with a sticky coin column on small screens
+
 ## Stack
 
 - Vue 3 (Composition API, `<script setup>`), TypeScript, Vite

@@ -1,14 +1,36 @@
 import { defineStore } from 'pinia';
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { fetchTopCoins } from '@/api/coingecko';
 import { toApiError, type ApiError } from '@/api/http';
 import type { CoinListing } from '@/types/market';
+import { readStorage, STORAGE_KEYS, writeStorage } from '@/utils/storage';
+
+function readSavedWatchlist(): string[] {
+    const savedWatchlist = readStorage(STORAGE_KEYS.watchlist);
+
+    if (!savedWatchlist) {
+        return [];
+    }
+
+    try {
+        const parsed: unknown = JSON.parse(savedWatchlist);
+
+        return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string') : [];
+    } catch {
+        return [];
+    }
+}
 
 export const useMarketStore = defineStore('market', () => {
     const coins = ref<CoinListing[]>([]);
-    const watchlist = ref<string[]>([]);
+    const watchlist = ref<string[]>(readSavedWatchlist());
     const isLoading = ref<boolean>(false);
     const loadError = ref<ApiError | null>(null);
+    const lastUpdatedAt = ref<Date | null>(null);
+
+    const watchedCoins = computed(() =>
+        coins.value.filter((coin) => watchlist.value.includes(coin.id)),
+    );
 
     async function loadTopCoins(): Promise<void> {
         isLoading.value = true;
@@ -16,10 +38,17 @@ export const useMarketStore = defineStore('market', () => {
 
         try {
             coins.value = await fetchTopCoins();
+            lastUpdatedAt.value = new Date();
         } catch (error) {
             loadError.value = toApiError(error);
         } finally {
             isLoading.value = false;
+        }
+    }
+
+    async function ensureCoinsLoaded(): Promise<void> {
+        if (coins.value.length === 0 && !isLoading.value) {
+            await loadTopCoins();
         }
     }
 
@@ -33,5 +62,22 @@ export const useMarketStore = defineStore('market', () => {
             : [...watchlist.value, coinId];
     }
 
-    return { coins, watchlist, isLoading, loadError, loadTopCoins, isWatched, toggleWatch };
+    function saveWatchlist(ids: string[]): void {
+        writeStorage(STORAGE_KEYS.watchlist, JSON.stringify(ids));
+    }
+
+    watch(watchlist, saveWatchlist);
+
+    return {
+        coins,
+        watchlist,
+        isLoading,
+        loadError,
+        lastUpdatedAt,
+        watchedCoins,
+        loadTopCoins,
+        ensureCoinsLoaded,
+        isWatched,
+        toggleWatch,
+    };
 });
