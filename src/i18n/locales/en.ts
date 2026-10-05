@@ -12,6 +12,20 @@ export default {
     language: {
         label: 'Language',
     },
+    liveStatus: {
+        idle: '',
+        idleHint: '',
+        connecting: 'Connecting…',
+        connectingHint: 'Connecting to live prices from Binance.',
+        live: 'Live',
+        liveHint: 'Prices update in real time from Binance.',
+        reconnecting: 'Reconnecting…',
+        reconnectingHint: 'Connection to Binance lost. Reconnecting.',
+        paused: 'Paused',
+        pausedHint: 'Live updates pause while this tab is in the background.',
+        unavailable: 'Offline',
+        unavailableHint: 'Live prices are unavailable. Showing CoinGecko data.',
+    },
     theme: {
         switchToDark: 'Switch to dark theme',
         switchToLight: 'Switch to light theme',
@@ -49,7 +63,7 @@ export default {
         intro: 'Market Terminal shows the largest cryptocurrencies by market capitalization: current price, short-term change, trading volume and the last seven days at a glance.',
         dataTitle: 'Data',
         dataText:
-            'Market data comes from the CoinGecko public API and is refreshed each time you open the Markets page.',
+            'Market data comes from the CoinGecko public API. For coins traded on Binance, price and 24h change update live through its public market data stream.',
         stackTitle: 'Built with',
         sourceTitle: 'Source code',
         sourceLink: 'View the repository on GitHub',

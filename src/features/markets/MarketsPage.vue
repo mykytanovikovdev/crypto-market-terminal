@@ -8,6 +8,7 @@ import { useApiErrorMessage } from '@/composables/useApiErrorMessage';
 import { useLocale } from '@/composables/useLocale';
 import MarketTable from '@/features/market-table/MarketTable.vue';
 import MarketTableSkeleton from '@/features/market-table/MarketTableSkeleton.vue';
+import { useLiveCoins } from '@/features/market-table/useLiveCoins';
 import { useSortQuery } from '@/features/market-table/useSortQuery';
 import MarketToolbar from '@/features/markets/MarketToolbar.vue';
 import { useMarketFiltersQuery } from '@/features/markets/useMarketFiltersQuery';
@@ -25,12 +26,11 @@ const { sort, toggleSort } = useSortQuery();
 const { searchQuery, movement, rowsLimit, hasActiveFilters, resetFilters } =
     useMarketFiltersQuery();
 
-const visibleCoins = computed(() =>
-    sortCoins(
-        filterCoins(coins.value, { query: searchQuery.value, movement: movement.value }),
-        sort.value,
-    ),
+const filteredCoins = computed(() =>
+    filterCoins(coins.value, { query: searchQuery.value, movement: movement.value }),
 );
+const liveCoins = useLiveCoins(filteredCoins);
+const visibleCoins = computed(() => sortCoins(liveCoins.value, sort.value));
 
 const updatedAtLabel = computed(() => {
     if (!lastUpdatedAt.value) {

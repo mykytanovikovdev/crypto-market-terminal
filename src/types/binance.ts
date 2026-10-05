@@ -1,10 +1,11 @@
-export interface BinanceTradeEventDto {
-    e: 'trade';
+export interface BinanceMiniTickerDto {
+    e: '24hrMiniTicker';
     s: string;
-    p: string;
+    c: string;
+    o: string;
 }
 
-export interface BinanceCombinedStreamMessageDto {
+export interface BinanceStreamMessageDto {
     stream: string;
-    data: BinanceTradeEventDto;
+    data: BinanceMiniTickerDto;
 }

@@ -9,6 +9,9 @@ integration, real-time data over WebSocket, and a deliberately non-generic UI.
 
 - Top 50 coins by market cap: price, 1h / 24h / 7d change, market cap, 24h volume,
   circulating supply and a 7-day sparkline
+- Live prices and 24h change from Binance for coins listed there, with a connection indicator
+  that pauses in background tabs and reconnects automatically
+- Sorting, search and gainers/losers filters, all kept in the URL
 - Watchlist saved in the browser
 - English and Persian (right-to-left) interface
 - Light and dark themes that follow the system setting by default

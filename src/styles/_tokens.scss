@@ -13,6 +13,7 @@
     --color-on-accent: #fff;
     --color-up: #0a8754;
     --color-down: #d1323f;
+    --color-warning: #a86500;
     --color-watch: #f5b400;
 
     --font-body: 'Inter', 'Vazirmatn', system-ui, sans-serif;
@@ -42,6 +43,7 @@
     --layout-max-width: 90rem;
 
     --transition-fast: 120ms ease-out;
+    --transition-flash: 700ms ease-out;
 }
 
 :root[data-theme='dark'] {
@@ -59,5 +61,6 @@
     --color-on-accent: #0f1319;
     --color-up: #2fbf85;
     --color-down: #f2606c;
+    --color-warning: #e0a83a;
     --color-watch: #f5c542;
 }
