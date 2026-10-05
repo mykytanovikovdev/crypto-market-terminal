@@ -7,6 +7,7 @@ import RequestState from '@/components/RequestState.vue';
 import { useApiErrorMessage } from '@/composables/useApiErrorMessage';
 import MarketTable from '@/features/market-table/MarketTable.vue';
 import MarketTableSkeleton from '@/features/market-table/MarketTableSkeleton.vue';
+import { useLiveCoins } from '@/features/market-table/useLiveCoins';
 import { useSortQuery } from '@/features/market-table/useSortQuery';
 import { useMarketStore } from '@/stores/market';
 import { sortCoins } from '@/utils/sortCoins';
@@ -17,7 +18,8 @@ const { watchedCoins, watchlist, isWatchlistLoading, watchlistError } = storeToR
 const errorMessage = useApiErrorMessage(watchlistError);
 const { sort, toggleSort } = useSortQuery();
 
-const sortedCoins = computed(() => sortCoins(watchedCoins.value, sort.value));
+const liveCoins = useLiveCoins(watchedCoins);
+const sortedCoins = computed(() => sortCoins(liveCoins.value, sort.value));
 
 onMounted(marketStore.refreshWatchedCoins);
 </script>

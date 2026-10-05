@@ -24,8 +24,17 @@ export interface Candle {
 
 export interface TickerUpdate {
     symbol: string;
-    price: number;
+    lastPrice: number;
+    openPrice: number;
 }
+
+export interface LiveQuote {
+    price: number;
+    change24h: number;
+}
+
+export type LiveConnectionStatus =
+    'idle' | 'connecting' | 'live' | 'reconnecting' | 'paused' | 'unavailable';
 
 export type PriceDirection = 'up' | 'down' | 'flat';
 

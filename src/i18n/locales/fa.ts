@@ -14,6 +14,20 @@ const fa: typeof en = {
     language: {
         label: 'زبان',
     },
+    liveStatus: {
+        idle: '',
+        idleHint: '',
+        connecting: 'در حال اتصال…',
+        connectingHint: 'در حال اتصال به قیمت‌های زنده Binance.',
+        live: 'زنده',
+        liveHint: 'قیمت‌ها به‌صورت لحظه‌ای از Binance به‌روز می‌شوند.',
+        reconnecting: 'اتصال مجدد…',
+        reconnectingHint: 'اتصال به Binance قطع شد. در حال اتصال مجدد.',
+        paused: 'متوقف',
+        pausedHint: 'وقتی این تب در پس‌زمینه است، به‌روزرسانی زنده متوقف می‌شود.',
+        unavailable: 'آفلاین',
+        unavailableHint: 'قیمت‌های زنده در دسترس نیست. داده‌های CoinGecko نمایش داده می‌شود.',
+    },
     theme: {
         switchToDark: 'رفتن به حالت تیره',
         switchToLight: 'رفتن به حالت روشن',
@@ -51,7 +65,7 @@ const fa: typeof en = {
         intro: 'Market Terminal بزرگ‌ترین ارزهای دیجیتال را بر اساس ارزش بازار نشان می‌دهد: قیمت فعلی، تغییرات کوتاه‌مدت، حجم معاملات و روند هفت روز گذشته در یک نگاه.',
         dataTitle: 'داده‌ها',
         dataText:
-            'داده‌های بازار از API عمومی CoinGecko دریافت می‌شود و هر بار که صفحه بازارها را باز می‌کنید به‌روز می‌شود.',
+            'داده‌های بازار از API عمومی CoinGecko دریافت می‌شود. برای ارزهایی که در Binance معامله می‌شوند، قیمت و تغییر 24 ساعته از طریق جریان عمومی داده‌های بازار به‌صورت زنده به‌روز می‌شود.',
         stackTitle: 'ساخته‌شده با',
         sourceTitle: 'کد منبع',
         sourceLink: 'مشاهده مخزن در GitHub',

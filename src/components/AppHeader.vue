@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n';
 import AppLogo from '@/components/AppLogo.vue';
 import LanguageSwitch from '@/components/LanguageSwitch.vue';
+import LiveStatus from '@/components/LiveStatus.vue';
 import ThemeToggle from '@/components/ThemeToggle.vue';
 
 const NAV_LINKS = [
@@ -35,6 +36,7 @@ const { t } = useI18n();
             </nav>
 
             <div class="app-header__controls">
+                <LiveStatus />
                 <LanguageSwitch />
                 <ThemeToggle />
             </div>

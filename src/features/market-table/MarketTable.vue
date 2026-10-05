@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import LiveValue from '@/components/LiveValue.vue';
 import PercentChange from '@/components/PercentChange.vue';
 import { useLocale } from '@/composables/useLocale';
 import CoinSparkline from '@/features/market-table/CoinSparkline.vue';
@@ -172,9 +173,11 @@ function getSortIconState(key: SortKey): 'asc' | 'desc' | 'none' {
                         </span>
                     </th>
                     <td class="market-table__cell market-table__cell--numeric">
-                        <span class="market-table__value">
-                            {{ formatPrice(coin.price, numberLocale) }}
-                        </span>
+                        <LiveValue
+                            class="market-table__value"
+                            :value="coin.price"
+                            :text="formatPrice(coin.price, numberLocale)"
+                        />
                     </td>
                     <td class="market-table__cell market-table__cell--numeric">
                         <PercentChange :value="coin.change1h" :locale="numberLocale" />
