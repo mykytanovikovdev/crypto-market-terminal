@@ -1,5 +1,7 @@
 # Market Terminal
 
+[![CI](https://github.com/mykytanovikovdev/crypto-market-terminal/actions/workflows/ci.yml/badge.svg)](https://github.com/mykytanovikovdev/crypto-market-terminal/actions/workflows/ci.yml)
+
 A live crypto market dashboard built with Vue 3 + TypeScript: REST API
 integration, real-time data over WebSocket, and a deliberately non-generic UI.
 
@@ -42,6 +44,9 @@ npm run dev
 | `npm run lint:style` | Lint styles (SCSS, BEM naming, logical properties)           |
 | `npm run format`     | Format the codebase with Prettier                            |
 | `npm run check`      | Type-check, lint, format check and tests — run before a push |
+
+The same checks and a production build run on every pull request and on pushes to `main`
+via [GitHub Actions](.github/workflows/ci.yml).
 
 ## Data sources
 
