@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { describe, expect, it } from 'vitest';
 import MarketTable from '@/features/market-table/MarketTable.vue';
 import type { SortState } from '@/types/market';
 import { coinListings } from '../../../fixtures/coingecko';
-import { createTestPlugins } from '../../../helpers/plugins';
+import { createTestPlugins, createTestRouter } from '../../../helpers/plugins';
 
 function mountMarketTable(
     watchlist: string[] = [],
@@ -75,5 +75,29 @@ describe('MarketTable', () => {
         await buttons[0]?.trigger('click');
 
         expect(wrapper.emitted('toggleWatch')).toEqual([['bitcoin']]);
+    });
+});
+
+describe('MarketTable navigation', () => {
+    it('links the coin name to its page', () => {
+        const link = mountMarketTable().find('.market-table__coin');
+
+        expect(link.attributes('href')).toBe('/coin/bitcoin');
+    });
+
+    it('opens the coin page when a row is clicked, but not from the watch button', async () => {
+        const router = createTestRouter();
+        const wrapper = mount(MarketTable, {
+            props: { coins: coinListings, watchlist: [], sort: { key: 'rank', direction: 'asc' } },
+            global: { plugins: [...createTestPlugins().slice(0, 2), router] },
+        });
+
+        await wrapper.findAll('.market-table__watch-button')[1]?.trigger('click');
+        await flushPromises();
+        expect(router.currentRoute.value.name).not.toBe('coin');
+
+        await wrapper.findAll('tbody tr')[1]?.find('td:nth-child(4)').trigger('click');
+        await flushPromises();
+        expect(router.currentRoute.value.fullPath).toBe('/coin/litecoin');
     });
 });

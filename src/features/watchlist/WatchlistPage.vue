@@ -7,7 +7,7 @@ import RequestState from '@/components/RequestState.vue';
 import { useApiErrorMessage } from '@/composables/useApiErrorMessage';
 import MarketTable from '@/features/market-table/MarketTable.vue';
 import MarketTableSkeleton from '@/features/market-table/MarketTableSkeleton.vue';
-import { useLiveCoins } from '@/features/market-table/useLiveCoins';
+import { useLiveCoins } from '@/composables/useLiveCoins';
 import { useSortQuery } from '@/features/market-table/useSortQuery';
 import { useMarketStore } from '@/stores/market';
 import { sortCoins } from '@/utils/sortCoins';

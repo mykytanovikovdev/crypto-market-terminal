@@ -1,14 +1,19 @@
 import { defineStore } from 'pinia';
 import { ref, shallowRef } from 'vue';
 import { createTickerConnection } from '@/api/binanceSocket';
-import type { CoinListing, LiveConnectionStatus, LiveQuote, TickerUpdate } from '@/types/market';
+import type {
+    LiveConnectionStatus,
+    LiveQuote,
+    LiveTrackableCoin,
+    TickerUpdate,
+} from '@/types/market';
 import { isPlausibleLivePrice, toBinanceSymbol, toLiveQuote } from '@/utils/livePrices';
 
 const FLUSH_INTERVAL_MS = 1_000;
 const DISCONNECT_GRACE_MS = 3_000;
 
-function groupCoinsBySymbol(coins: CoinListing[]): Map<string, CoinListing[]> {
-    const coinsBySymbol = new Map<string, CoinListing[]>();
+function groupCoinsBySymbol(coins: LiveTrackableCoin[]): Map<string, LiveTrackableCoin[]> {
+    const coinsBySymbol = new Map<string, LiveTrackableCoin[]>();
 
     for (const coin of coins) {
         const symbol = toBinanceSymbol(coin.symbol);
@@ -25,7 +30,7 @@ export const useLiveTickerStore = defineStore('liveTicker', () => {
     const status = ref<LiveConnectionStatus>('idle');
     const quotes = shallowRef<Record<string, LiveQuote>>({});
 
-    let trackedCoins = new Map<string, CoinListing[]>();
+    let trackedCoins = new Map<string, LiveTrackableCoin[]>();
     const pendingUpdates = new Map<string, TickerUpdate>();
     let flushTimer: ReturnType<typeof setTimeout> | null = null;
     let disconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -75,7 +80,7 @@ export const useLiveTickerStore = defineStore('liveTicker', () => {
         );
     }
 
-    function trackCoins(coins: CoinListing[]): void {
+    function trackCoins(coins: LiveTrackableCoin[]): void {
         cancelPendingDisconnect();
         trackedCoins = groupCoinsBySymbol(coins);
         keepQuotesForTrackedCoins();

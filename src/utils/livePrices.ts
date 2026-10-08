@@ -1,4 +1,4 @@
-import type { CoinListing, LiveQuote, TickerUpdate } from '@/types/market';
+import type { LiveQuote, LiveTrackableCoin, TickerUpdate } from '@/types/market';
 
 const QUOTE_ASSET = 'USDT';
 const VALID_BASE_ASSET = /^[A-Z0-9]{2,15}$/;
@@ -31,6 +31,9 @@ export function toLiveQuote(update: TickerUpdate): LiveQuote {
     };
 }
 
-export function applyLiveQuote(coin: CoinListing, quote: LiveQuote | undefined): CoinListing {
+export function applyLiveQuote<TCoin extends LiveTrackableCoin>(
+    coin: TCoin,
+    quote: LiveQuote | undefined,
+): TCoin {
     return quote ? { ...coin, price: quote.price, change24h: quote.change24h } : coin;
 }

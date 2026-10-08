@@ -11,6 +11,7 @@ export function createTestRouter() {
             { path: '/', name: 'markets', component: stubPage },
             { path: '/watchlist', name: 'watchlist', component: stubPage },
             { path: '/about', name: 'about', component: stubPage },
+            { path: '/coin/:id', name: 'coin', component: stubPage },
         ],
     });
 }

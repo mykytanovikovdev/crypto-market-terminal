@@ -8,6 +8,10 @@ const { t } = useI18n();
 const route = useRoute();
 
 function updateDocumentTitle(): void {
+    if (route.meta.hasOwnTitle) {
+        return;
+    }
+
     const titleKey = route.meta.titleKey;
 
     document.title = titleKey ? t('app.pageTitle', { page: t(titleKey) }) : 'Market Terminal';

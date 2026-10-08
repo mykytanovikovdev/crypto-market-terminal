@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
+import { useRouter } from 'vue-router';
 import LiveValue from '@/components/LiveValue.vue';
 import PercentChange from '@/components/PercentChange.vue';
 import { useLocale } from '@/composables/useLocale';
@@ -48,6 +49,7 @@ const COLUMNS: ColumnDefinition[] = [
 
 const { t } = useI18n();
 const { numberLocale } = useLocale();
+const router = useRouter();
 
 function isWatched(coinId: string): boolean {
     return props.watchlist.includes(coinId);
@@ -63,6 +65,20 @@ function getWatchButtonLabel(coin: CoinListing): string {
 
 function handleWatchClick(coinId: string): void {
     emit('toggleWatch', coinId);
+}
+
+function isPlainPrimaryClick(event: MouseEvent): boolean {
+    return (
+        event.button === 0 && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
+    );
+}
+
+function handleRowClick(event: MouseEvent, coinId: string): void {
+    const clickedControl = (event.target as Element).closest('a, button');
+
+    if (!clickedControl && isPlainPrimaryClick(event)) {
+        void router.push({ name: 'coin', params: { id: coinId } });
+    }
 }
 
 function handleSortClick(key: SortKey): void {
@@ -130,7 +146,12 @@ function getSortIconState(key: SortKey): 'asc' | 'desc' | 'none' {
                 </tr>
             </thead>
             <tbody>
-                <tr v-for="coin in coins" :key="coin.id" class="market-table__row">
+                <tr
+                    v-for="coin in coins"
+                    :key="coin.id"
+                    class="market-table__row"
+                    @click="handleRowClick($event, coin.id)"
+                >
                     <td class="market-table__cell market-table__cell--watch">
                         <button
                             type="button"
@@ -155,7 +176,10 @@ function getSortIconState(key: SortKey): 'asc' | 'desc' | 'none' {
                         {{ coin.rank ?? '—' }}
                     </td>
                     <th class="market-table__cell market-table__cell--name" scope="row">
-                        <span class="market-table__coin">
+                        <RouterLink
+                            class="market-table__coin"
+                            :to="{ name: 'coin', params: { id: coin.id } }"
+                        >
                             <img
                                 class="market-table__logo"
                                 :src="coin.imageUrl"
@@ -170,7 +194,7 @@ function getSortIconState(key: SortKey): 'asc' | 'desc' | 'none' {
                                 </span>
                                 <span class="market-table__symbol">{{ coin.symbol }}</span>
                             </span>
-                        </span>
+                        </RouterLink>
                     </th>
                     <td class="market-table__cell market-table__cell--numeric">
                         <LiveValue
@@ -339,6 +363,10 @@ function getSortIconState(key: SortKey): 'asc' | 'desc' | 'none' {
         }
     }
 
+    &__row {
+        cursor: pointer;
+    }
+
     &__row:hover &__cell {
         background: var(--color-surface-hover);
     }
@@ -347,6 +375,12 @@ function getSortIconState(key: SortKey): 'asc' | 'desc' | 'none' {
         display: inline-flex;
         gap: var(--space-2);
         align-items: center;
+        color: inherit;
+        text-decoration: none;
+
+        &:hover .market-table__name {
+            color: var(--color-accent);
+        }
     }
 
     &__logo {

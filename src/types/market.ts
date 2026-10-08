@@ -20,6 +20,7 @@ export interface Candle {
     high: number;
     low: number;
     close: number;
+    volume: number | null;
 }
 
 export interface TickerUpdate {
@@ -27,6 +28,8 @@ export interface TickerUpdate {
     lastPrice: number;
     openPrice: number;
 }
+
+export type LiveTrackableCoin = Pick<CoinListing, 'id' | 'symbol' | 'price' | 'change24h'>;
 
 export interface LiveQuote {
     price: number;
