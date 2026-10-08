@@ -1,14 +1,14 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { nextTick, ref } from 'vue';
 import { createTickerConnection, type TickerConnectionHandlers } from '@/api/binanceSocket';
-import { useLiveCoins } from '@/features/market-table/useLiveCoins';
-import { coinListings } from '../../../fixtures/coingecko';
-import { withSetup } from '../../../helpers/withSetup';
+import { useLiveCoins } from '@/composables/useLiveCoins';
+import { coinListings } from '../../fixtures/coingecko';
+import { withSetup } from '../../helpers/withSetup';
 
 import {
     createTickerConnectionMock,
     type TickerConnectionMock,
-} from '../../../helpers/tickerConnectionMock';
+} from '../../helpers/tickerConnectionMock';
 
 vi.mock('@/api/binanceSocket', () => ({ createTickerConnection: vi.fn() }));
 

@@ -8,7 +8,7 @@ import { useApiErrorMessage } from '@/composables/useApiErrorMessage';
 import { useLocale } from '@/composables/useLocale';
 import MarketTable from '@/features/market-table/MarketTable.vue';
 import MarketTableSkeleton from '@/features/market-table/MarketTableSkeleton.vue';
-import { useLiveCoins } from '@/features/market-table/useLiveCoins';
+import { useLiveCoins } from '@/composables/useLiveCoins';
 import { useSortQuery } from '@/features/market-table/useSortQuery';
 import MarketToolbar from '@/features/markets/MarketToolbar.vue';
 import { useMarketFiltersQuery } from '@/features/markets/useMarketFiltersQuery';

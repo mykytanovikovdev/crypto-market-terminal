@@ -11,6 +11,9 @@ integration, real-time data over WebSocket, and a deliberately non-generic UI.
   circulating supply and a 7-day sparkline
 - Live prices and 24h change from Binance for coins listed there, with a connection indicator
   that pauses in background tabs and reconnects automatically
+- Coin pages with a candlestick or line chart (TradingView Lightweight Charts), volume,
+  SMA 20/50 and RSI 14, an OHLCV legend that follows the cursor, market stats, a converter
+  and the coin's description and links
 - Sorting, search and gainers/losers filters, all kept in the URL
 - Watchlist saved in the browser
 - English and Persian (right-to-left) interface
@@ -20,6 +23,7 @@ integration, real-time data over WebSocket, and a deliberately non-generic UI.
 ## Stack
 
 - Vue 3 (Composition API, `<script setup>`), TypeScript, Vite
+- TradingView Lightweight Charts
 - Pinia, Vue Router, Vue I18n
 - Axios for REST, native WebSocket for live ticks
 - Sass with BEM naming
@@ -55,4 +59,6 @@ via [GitHub Actions](.github/workflows/ci.yml).
 
 - [CoinGecko API](https://docs.coingecko.com/reference/introduction) — market
   data, no key required for the free tier
+- [Binance REST API](https://developers.binance.com/docs/binance-spot-api-docs/rest-api) —
+  candlesticks with volume for coins listed on Binance
 - [Binance WebSocket streams](https://developers.binance.com/docs/binance-spot-api-docs/web-socket-streams) — live trade ticks, no auth required

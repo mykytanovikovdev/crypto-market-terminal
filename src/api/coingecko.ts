@@ -1,6 +1,13 @@
 import { createHttpClient } from '@/api/http';
-import type { CoinGeckoMarketDto, CoinGeckoOhlcRow } from '@/types/coingecko';
+import type { CoinDetails, CoinLink, PriceExtreme } from '@/types/coin';
+import type {
+    CoinGeckoCoinDetailsDto,
+    CoinGeckoMarketDto,
+    CoinGeckoOhlcRow,
+} from '@/types/coingecko';
 import type { Candle, CoinListing } from '@/types/market';
+import { htmlToParagraphs } from '@/utils/text';
+import { isSafeHttpUrl } from '@/utils/url';
 
 const COINGECKO_BASE_URL = 'https://api.coingecko.com/api/v3';
 const QUOTE_CURRENCY = 'usd';
@@ -48,6 +55,7 @@ export function mapOhlcRowToCandle([
         high,
         low,
         close,
+        volume: null,
     };
 }
 
@@ -71,10 +79,85 @@ export async function fetchCoinsByIds(ids: string[]): Promise<CoinListing[]> {
     return data.map(mapMarketDtoToCoinListing);
 }
 
-export async function fetchCandles(coinId: string, days = 1): Promise<Candle[]> {
+export async function fetchCoinGeckoCandles(coinId: string, days: number): Promise<Candle[]> {
     const { data } = await coinGeckoClient.get<CoinGeckoOhlcRow[]>(`/coins/${coinId}/ohlc`, {
         params: { vs_currency: QUOTE_CURRENCY, days },
     });
 
     return data.map(mapOhlcRowToCandle);
+}
+
+function toPriceExtreme(
+    price: number | null | undefined,
+    date: string | null | undefined,
+    changePercent: number | null | undefined,
+): PriceExtreme | null {
+    if (price === null || price === undefined || !date) {
+        return null;
+    }
+
+    return { price, date: new Date(date), changePercent: changePercent ?? 0 };
+}
+
+function collectLinks(links: CoinGeckoCoinDetailsDto['links']): CoinLink[] {
+    const candidates: CoinLink[] = [
+        { kind: 'website', url: links.homepage[0] ?? '' },
+        { kind: 'whitepaper', url: links.whitepaper ?? '' },
+        { kind: 'explorer', url: links.blockchain_site[0] ?? '' },
+        { kind: 'github', url: links.repos_url.github[0] ?? '' },
+        { kind: 'reddit', url: links.subreddit_url ?? '' },
+    ];
+
+    return candidates.filter((link) => isSafeHttpUrl(link.url));
+}
+
+export function mapCoinDetailsDto(dto: CoinGeckoCoinDetailsDto): CoinDetails {
+    const market = dto.market_data;
+
+    return {
+        id: dto.id,
+        symbol: dto.symbol,
+        name: dto.name,
+        imageUrl: dto.image.large,
+        rank: dto.market_cap_rank,
+        price: market.current_price.usd ?? 0,
+        change1h: market.price_change_percentage_1h_in_currency.usd ?? null,
+        change24h: market.price_change_percentage_24h_in_currency.usd ?? null,
+        change7d: market.price_change_percentage_7d_in_currency.usd ?? null,
+        change30d: market.price_change_percentage_30d_in_currency.usd ?? null,
+        change1y: market.price_change_percentage_1y_in_currency.usd ?? null,
+        marketCap: market.market_cap.usd ?? 0,
+        volume24h: market.total_volume.usd ?? 0,
+        fullyDilutedValuation: market.fully_diluted_valuation.usd ?? null,
+        high24h: market.high_24h.usd ?? null,
+        low24h: market.low_24h.usd ?? null,
+        circulatingSupply: market.circulating_supply ?? 0,
+        maxSupply: market.max_supply,
+        allTimeHigh: toPriceExtreme(
+            market.ath.usd,
+            market.ath_date.usd,
+            market.ath_change_percentage.usd,
+        ),
+        allTimeLow: toPriceExtreme(
+            market.atl.usd,
+            market.atl_date.usd,
+            market.atl_change_percentage.usd,
+        ),
+        descriptionParagraphs: htmlToParagraphs(dto.description.en ?? ''),
+        links: collectLinks(dto.links),
+    };
+}
+
+export async function fetchCoinDetails(coinId: string): Promise<CoinDetails> {
+    const { data } = await coinGeckoClient.get<CoinGeckoCoinDetailsDto>(`/coins/${coinId}`, {
+        params: {
+            localization: false,
+            tickers: false,
+            community_data: false,
+            developer_data: false,
+            sparkline: false,
+        },
+    });
+
+    return mapCoinDetailsDto(data);
 }

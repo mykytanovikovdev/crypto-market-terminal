@@ -2,11 +2,13 @@ import type { AxiosResponse } from 'axios';
 import { describe, expect, it, vi } from 'vitest';
 import {
     coinGeckoClient,
+    fetchCoinDetails,
     fetchCoinsByIds,
     fetchTopCoins,
     mapOhlcRowToCandle,
 } from '@/api/coingecko';
 import { coinGeckoMarketsResponse, coinListings } from '../../fixtures/coingecko';
+import { coinDetails, coinDetailsResponse } from '../../fixtures/coinDetails';
 
 describe('fetchTopCoins', () => {
     it('requests market data with sparklines and multi-period changes', async () => {
@@ -70,6 +72,32 @@ describe('mapOhlcRowToCandle', () => {
             high: 3,
             low: 0.5,
             close: 2,
+            volume: null,
         });
+    });
+});
+
+describe('fetchCoinDetails', () => {
+    it('requests only the market data and maps it to coin details', async () => {
+        const getSpy = vi
+            .spyOn(coinGeckoClient, 'get')
+            .mockResolvedValue({ data: coinDetailsResponse } as AxiosResponse);
+
+        const details = await fetchCoinDetails('bitcoin');
+
+        expect(getSpy).toHaveBeenCalledWith('/coins/bitcoin', {
+            params: expect.objectContaining({ tickers: false, community_data: false }),
+        });
+        expect(details).toEqual(coinDetails);
+    });
+
+    it('drops links that are empty or not http(s)', async () => {
+        vi.spyOn(coinGeckoClient, 'get').mockResolvedValue({
+            data: coinDetailsResponse,
+        } as AxiosResponse);
+
+        const { links } = await fetchCoinDetails('bitcoin');
+
+        expect(links.map((link) => link.kind)).not.toContain('explorer');
     });
 });

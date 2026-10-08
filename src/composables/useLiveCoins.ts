@@ -1,11 +1,13 @@
-import { computed, onBeforeUnmount, watch, type Ref } from 'vue';
+import { computed, onBeforeUnmount, watch, type ComputedRef, type Ref } from 'vue';
 import { useLiveTickerStore } from '@/stores/liveTicker';
-import type { CoinListing } from '@/types/market';
+import type { LiveTrackableCoin } from '@/types/market';
 import { applyLiveQuote } from '@/utils/livePrices';
 
 const TRACKING_DEBOUNCE_MS = 400;
 
-export function useLiveCoins(coins: Ref<CoinListing[]>) {
+export function useLiveCoins<TCoin extends LiveTrackableCoin>(
+    coins: Ref<TCoin[]>,
+): ComputedRef<TCoin[]> {
     const liveTicker = useLiveTickerStore();
     let trackingTimer: ReturnType<typeof setTimeout> | null = null;
 

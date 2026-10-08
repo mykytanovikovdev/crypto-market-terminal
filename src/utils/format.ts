@@ -47,3 +47,23 @@ export function formatCompactNumber(value: number, locale: string): string {
 export function formatTime(date: Date, locale: string): string {
     return new Intl.DateTimeFormat(locale, { hour: '2-digit', minute: '2-digit' }).format(date);
 }
+
+export function formatDate(date: Date, locale: string): string {
+    return new Intl.DateTimeFormat(locale, {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+    }).format(date);
+}
+
+export function formatSignedPercent(percent: number, locale: string): string {
+    return new Intl.NumberFormat(locale, {
+        style: 'percent',
+        maximumFractionDigits: 1,
+        signDisplay: 'exceptZero',
+    }).format(percent / 100);
+}
+
+export function formatAmount(value: number, locale: string, maximumFractionDigits: number): string {
+    return new Intl.NumberFormat(locale, { maximumFractionDigits }).format(value);
+}

@@ -22,6 +22,12 @@ export const router = createRouter({
             meta: { titleKey: 'nav.about' },
         },
         {
+            path: '/coin/:id',
+            name: 'coin',
+            component: () => import('@/features/coin-detail/CoinPage.vue'),
+            meta: { hasOwnTitle: true },
+        },
+        {
             path: '/:pathMatch(.*)*',
             redirect: { name: 'markets' },
         },

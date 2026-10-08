@@ -2,6 +2,7 @@ export const STORAGE_KEYS = {
     theme: 'market-terminal:theme',
     locale: 'market-terminal:locale',
     watchlist: 'market-terminal:watchlist',
+    chartSettings: 'market-terminal:chart-settings',
 } as const;
 
 export function readStorage(key: string): string | null {
