@@ -40,20 +40,23 @@ function handleWatchClick(): void {
                 #{{ coin.rank }}
             </span>
 
-            <button
-                type="button"
-                class="coin-header__watch"
-                :class="{ 'coin-header__watch--active': isWatched }"
-                :aria-pressed="isWatched"
-                @click="handleWatchClick"
-            >
-                <svg class="coin-header__watch-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path
-                        d="m12 3 2.76 5.6 6.18.9-4.47 4.36 1.05 6.15L12 17.1l-5.52 2.9 1.05-6.15L3.06 9.5l6.18-.9L12 3Z"
-                    />
-                </svg>
-                {{ isWatched ? t('coin.watching') : t('coin.watch') }}
-            </button>
+            <div class="coin-header__actions">
+                <slot name="actions" />
+                <button
+                    type="button"
+                    class="coin-header__watch"
+                    :class="{ 'coin-header__watch--active': isWatched }"
+                    :aria-pressed="isWatched"
+                    @click="handleWatchClick"
+                >
+                    <svg class="coin-header__watch-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                            d="m12 3 2.76 5.6 6.18.9-4.47 4.36 1.05 6.15L12 17.1l-5.52 2.9 1.05-6.15L3.06 9.5l6.18-.9L12 3Z"
+                        />
+                    </svg>
+                    {{ isWatched ? t('coin.watching') : t('coin.watch') }}
+                </button>
+            </div>
         </div>
 
         <p class="coin-header__quote">
@@ -72,6 +75,7 @@ function handleWatchClick(): void {
 @use '@/styles/breakpoints' as *;
 
 .coin-header {
+    position: relative;
     display: grid;
     gap: var(--space-3);
 
@@ -109,11 +113,17 @@ function handleWatchClick(): void {
         font-weight: 600;
     }
 
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--space-2);
+        margin-inline-start: auto;
+    }
+
     &__watch {
         display: inline-flex;
         gap: var(--space-2);
         align-items: center;
-        margin-inline-start: auto;
         padding-block: var(--space-2);
         padding-inline: var(--space-3);
         background: var(--color-bg);

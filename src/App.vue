@@ -3,6 +3,8 @@ import { watchEffect } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import AppHeader from '@/components/AppHeader.vue';
+import ToastStack from '@/components/ToastStack.vue';
+import { useAlertMonitor } from '@/features/alerts/useAlertMonitor';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -18,6 +20,7 @@ function updateDocumentTitle(): void {
 }
 
 watchEffect(updateDocumentTitle);
+useAlertMonitor();
 </script>
 
 <template>
@@ -26,6 +29,7 @@ watchEffect(updateDocumentTitle);
     <main id="main-content" class="app-shell__main" tabindex="-1">
         <RouterView />
     </main>
+    <ToastStack />
 </template>
 
 <style lang="scss" scoped>

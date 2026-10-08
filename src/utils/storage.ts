@@ -3,6 +3,7 @@ export const STORAGE_KEYS = {
     locale: 'market-terminal:locale',
     watchlist: 'market-terminal:watchlist',
     chartSettings: 'market-terminal:chart-settings',
+    alerts: 'market-terminal:alerts',
 } as const;
 
 export function readStorage(key: string): string | null {

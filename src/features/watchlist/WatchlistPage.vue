@@ -3,6 +3,7 @@ import { storeToRefs } from 'pinia';
 import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import PageHeader from '@/components/PageHeader.vue';
+import AlertsSection from '@/features/alerts/AlertsSection.vue';
 import RequestState from '@/components/RequestState.vue';
 import { useApiErrorMessage } from '@/composables/useApiErrorMessage';
 import MarketTable from '@/features/market-table/MarketTable.vue';
@@ -54,6 +55,8 @@ onMounted(marketStore.refreshWatchedCoins);
                 @sort="toggleSort"
             />
         </RequestState>
+
+        <AlertsSection />
     </section>
 </template>
 

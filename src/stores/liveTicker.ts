@@ -26,11 +26,15 @@ function groupCoinsBySymbol(coins: LiveTrackableCoin[]): Map<string, LiveTrackab
     return coinsBySymbol;
 }
 
+export type TrackingSource = 'page' | 'alerts';
+
 export const useLiveTickerStore = defineStore('liveTicker', () => {
     const status = ref<LiveConnectionStatus>('idle');
     const quotes = shallowRef<Record<string, LiveQuote>>({});
 
+    const coinsBySource: Record<TrackingSource, LiveTrackableCoin[]> = { page: [], alerts: [] };
     let trackedCoins = new Map<string, LiveTrackableCoin[]>();
+    let isDocumentHidden = document.hidden;
     const pendingUpdates = new Map<string, TickerUpdate>();
     let flushTimer: ReturnType<typeof setTimeout> | null = null;
     let disconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -72,37 +76,73 @@ export const useLiveTickerStore = defineStore('liveTicker', () => {
         }
     }
 
+    function mergeSources(sources: TrackingSource[]): LiveTrackableCoin[] {
+        const coinsById = new Map<string, LiveTrackableCoin>();
+
+        for (const source of sources) {
+            for (const coin of coinsBySource[source]) {
+                if (!coinsById.has(coin.id)) {
+                    coinsById.set(coin.id, coin);
+                }
+            }
+        }
+
+        return [...coinsById.values()];
+    }
+
     function keepQuotesForTrackedCoins(): void {
         const trackedIds = new Set([...trackedCoins.values()].flat().map((coin) => coin.id));
-
-        quotes.value = Object.fromEntries(
-            Object.entries(quotes.value).filter(([coinId]) => trackedIds.has(coinId)),
+        const keptEntries = Object.entries(quotes.value).filter(([coinId]) =>
+            trackedIds.has(coinId),
         );
+
+        if (keptEntries.length !== Object.keys(quotes.value).length) {
+            quotes.value = Object.fromEntries(keptEntries);
+        }
     }
 
-    function trackCoins(coins: LiveTrackableCoin[]): void {
-        cancelPendingDisconnect();
-        trackedCoins = groupCoinsBySymbol(coins);
+    // While the tab is hidden only alert coins stay subscribed, so alerts can still fire;
+    // quotes of page coins are kept so the table does not fall back to stale prices on return.
+    function applySubscriptions(): void {
+        trackedCoins = groupCoinsBySymbol(mergeSources(['page', 'alerts']));
         keepQuotesForTrackedCoins();
-        connection.setSymbols([...trackedCoins.keys()]);
+
+        const subscribedCoins = isDocumentHidden
+            ? coinsBySource.alerts
+            : mergeSources(['page', 'alerts']);
+
+        if (isDocumentHidden && subscribedCoins.length === 0) {
+            connection.pause();
+
+            return;
+        }
+
+        connection.resume();
+        connection.setSymbols([...groupCoinsBySymbol(subscribedCoins).keys()]);
     }
 
-    function disconnect(): void {
+    function trackCoins(coins: LiveTrackableCoin[], source: TrackingSource = 'page'): void {
+        if (source === 'page') {
+            cancelPendingDisconnect();
+        }
+
+        coinsBySource[source] = coins;
+        applySubscriptions();
+    }
+
+    function releasePageCoins(): void {
         disconnectTimer = null;
-        trackCoins([]);
+        trackCoins([], 'page');
     }
 
     function stopTracking(): void {
         cancelPendingDisconnect();
-        disconnectTimer = setTimeout(disconnect, DISCONNECT_GRACE_MS);
+        disconnectTimer = setTimeout(releasePageCoins, DISCONNECT_GRACE_MS);
     }
 
     function handleVisibilityChange(): void {
-        if (document.hidden) {
-            connection.pause();
-        } else {
-            connection.resume();
-        }
+        isDocumentHidden = document.hidden;
+        applySubscriptions();
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);

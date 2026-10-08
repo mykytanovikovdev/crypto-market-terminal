@@ -187,9 +187,52 @@ export default {
         github: 'GitHub',
         reddit: 'Reddit',
     },
+    alerts: {
+        button: 'Set alert',
+        buttonWithCount: 'Alerts ({count})',
+        panelLabel: 'Price alerts for {name}',
+        activeForCoin: 'Active alerts',
+        sectionTitle: 'Price alerts',
+        sectionDescription:
+            'You get a notification when a coin reaches your price while this site is open in any tab.',
+        activeTitle: 'Active',
+        triggeredTitle: 'Triggered',
+        empty: 'No price alerts yet. Open a coin and choose Set alert.',
+        condition: {
+            above: 'Above {price}',
+            below: 'Below {price}',
+        },
+        fromCurrentPrice: '{percent} from the current price',
+        triggeredAt: 'Reached {price} at {time}',
+        rearm: 'Turn on again',
+        remove: 'Remove',
+        notificationTitle: '{symbol} price alert',
+        notificationBody: {
+            above: '{name} rose above {target}. Now {price}.',
+            below: '{name} fell below {target}. Now {price}.',
+        },
+        form: {
+            label: 'Notify me when the price reaches',
+            hint: {
+                above: '{percent} above the current price',
+                below: '{percent} below the current price',
+            },
+            invalidPrice: 'Enter a price greater than zero.',
+            currentPriceHint: 'The current price is {price}. Enter a higher or lower price.',
+            pollingNote:
+                'Live prices are not available for this coin, so it is checked once a minute.',
+            notificationsBlocked:
+                'Browser notifications are off. Alerts will appear on this site only.',
+            submit: 'Create alert',
+        },
+    },
+    toasts: {
+        dismiss: 'Dismiss',
+    },
     errors: {
         rateLimited: 'CoinGecko rate limit reached. Try again in a minute.',
-        network: 'Could not reach CoinGecko. Check your connection and try again.',
+        network:
+            'CoinGecko did not respond. Its free API may be busy or you may be offline. Try again in a minute.',
         http: 'CoinGecko responded with an error ({status}).',
         unknown: 'Something went wrong while loading market data.',
     },
