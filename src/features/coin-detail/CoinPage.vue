@@ -8,6 +8,7 @@ import { useApiErrorMessage } from '@/composables/useApiErrorMessage';
 import { useAsyncResource } from '@/composables/useAsyncResource';
 import { useLiveCoins } from '@/composables/useLiveCoins';
 import { useLocale } from '@/composables/useLocale';
+import PriceAlertControl from '@/features/alerts/PriceAlertControl.vue';
 import ChartToolbar from '@/features/coin-detail/ChartToolbar.vue';
 import { TIMEFRAME_SETTINGS } from '@/features/coin-detail/chartTimeframes';
 import CoinAbout from '@/features/coin-detail/CoinAbout.vue';
@@ -112,7 +113,15 @@ watchEffect(updateDocumentTitle);
                         :coin="coin"
                         :is-watched="marketStore.isWatched(coin.id)"
                         @toggle-watch="toggleWatch"
-                    />
+                    >
+                        <template #actions>
+                            <PriceAlertControl
+                                :coin="coin"
+                                :current-price="coin.price"
+                                :has-live-price="livePrice !== null"
+                            />
+                        </template>
+                    </CoinHeader>
 
                     <section class="coin-page__chart">
                         <ChartToolbar

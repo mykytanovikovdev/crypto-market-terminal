@@ -190,9 +190,52 @@ const fa: typeof en = {
         github: 'GitHub',
         reddit: 'Reddit',
     },
+    alerts: {
+        button: 'تنظیم هشدار',
+        buttonWithCount: 'هشدارها ({count})',
+        panelLabel: 'هشدارهای قیمت برای {name}',
+        activeForCoin: 'هشدارهای فعال',
+        sectionTitle: 'هشدارهای قیمت',
+        sectionDescription:
+            'وقتی قیمت یک ارز به مقدار تعیین‌شده برسد، تا زمانی که این سایت در یکی از تب‌ها باز است، اعلان دریافت می‌کنید.',
+        activeTitle: 'فعال',
+        triggeredTitle: 'فعال‌شده',
+        empty: 'هنوز هشدار قیمتی ندارید. صفحه یک ارز را باز کنید و «تنظیم هشدار» را بزنید.',
+        condition: {
+            above: 'بالاتر از {price}',
+            below: 'پایین‌تر از {price}',
+        },
+        fromCurrentPrice: '{percent} نسبت به قیمت فعلی',
+        triggeredAt: 'به {price} رسید در {time}',
+        rearm: 'فعال‌سازی دوباره',
+        remove: 'حذف',
+        notificationTitle: 'هشدار قیمت {symbol}',
+        notificationBody: {
+            above: '{name} از {target} بالاتر رفت. اکنون {price}.',
+            below: '{name} از {target} پایین‌تر آمد. اکنون {price}.',
+        },
+        form: {
+            label: 'وقتی قیمت به این مقدار رسید، خبرم کن',
+            hint: {
+                above: '{percent} بالاتر از قیمت فعلی',
+                below: '{percent} پایین‌تر از قیمت فعلی',
+            },
+            invalidPrice: 'قیمتی بزرگ‌تر از صفر وارد کنید.',
+            currentPriceHint: 'قیمت فعلی {price} است. قیمتی بالاتر یا پایین‌تر وارد کنید.',
+            pollingNote:
+                'قیمت زنده برای این ارز در دسترس نیست، بنابراین هر دقیقه یک بار بررسی می‌شود.',
+            notificationsBlocked:
+                'اعلان‌های مرورگر خاموش است. هشدارها فقط در همین سایت نمایش داده می‌شوند.',
+            submit: 'ایجاد هشدار',
+        },
+    },
+    toasts: {
+        dismiss: 'بستن',
+    },
     errors: {
         rateLimited: 'به سقف درخواست‌های CoinGecko رسیدیم. یک دقیقه دیگر دوباره تلاش کنید.',
-        network: 'اتصال به CoinGecko برقرار نشد. اتصال اینترنت را بررسی کنید و دوباره تلاش کنید.',
+        network:
+            'CoinGecko پاسخ نداد. ممکن است API رایگان آن شلوغ باشد یا اینترنت قطع باشد. یک دقیقه دیگر دوباره تلاش کنید.',
         http: 'CoinGecko با خطا پاسخ داد ({status}).',
         unknown: 'هنگام بارگذاری داده‌های بازار مشکلی پیش آمد.',
     },

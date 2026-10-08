@@ -109,4 +109,43 @@ describe('live ticker store', () => {
         setDocumentHidden(false);
         expect(connection.resume).toHaveBeenCalled();
     });
+
+    it('keeps alert coins subscribed while the tab is hidden', () => {
+        const store = useLiveTickerStore();
+        store.trackCoins(coinListings.slice(0, 1));
+        store.trackCoins(coinListings.slice(1, 2), 'alerts');
+
+        expect(connection.setSymbols).toHaveBeenLastCalledWith(['BTCUSDT', 'LTCUSDT']);
+
+        setDocumentHidden(true);
+        expect(connection.setSymbols).toHaveBeenLastCalledWith(['LTCUSDT']);
+        expect(connection.pause).not.toHaveBeenCalled();
+
+        setDocumentHidden(false);
+        expect(connection.setSymbols).toHaveBeenLastCalledWith(['BTCUSDT', 'LTCUSDT']);
+    });
+
+    it('keeps quotes of page coins while hidden so the table does not jump back', () => {
+        const store = useLiveTickerStore();
+        store.trackCoins(coinListings.slice(0, 1));
+        handlers.onUpdate({ symbol: 'BTCUSDT', lastPrice: 64000, openPrice: 62000 });
+        vi.advanceTimersByTime(1_000);
+
+        setDocumentHidden(true);
+
+        expect(store.quotes.bitcoin?.price).toBe(64000);
+        setDocumentHidden(false);
+    });
+
+    it('does not replace quotes when nothing has to be dropped', () => {
+        const store = useLiveTickerStore();
+        store.trackCoins(coinListings);
+        handlers.onUpdate({ symbol: 'BTCUSDT', lastPrice: 64000, openPrice: 62000 });
+        vi.advanceTimersByTime(1_000);
+        const quotesBefore = store.quotes;
+
+        store.trackCoins(coinListings.slice(0, 2), 'alerts');
+
+        expect(store.quotes).toBe(quotesBefore);
+    });
 });

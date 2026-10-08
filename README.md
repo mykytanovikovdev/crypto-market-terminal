@@ -16,6 +16,8 @@ integration, real-time data over WebSocket, and a deliberately non-generic UI.
   and the coin's description and links
 - Sorting, search and gainers/losers filters, all kept in the URL
 - Watchlist saved in the browser
+- Price alerts with browser notifications and in-app toasts; coins with alerts stay tracked on
+  every page and in background tabs (coins without a Binance pair are checked once a minute)
 - English and Persian (right-to-left) interface
 - Light and dark themes that follow the system setting by default
 - Responsive layout with a sticky coin column on small screens
